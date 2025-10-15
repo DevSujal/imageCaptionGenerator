@@ -1,9 +1,10 @@
+# Use official Python 3.12.3 image
 # Multi-stage Dockerfile for Node.js (production)
 # Builds a minimal production image for the Express app in this repo.
 
 ### Build stage: install production dependencies
 FROM node:20-alpine AS builder
-WORKDIR /
+WORKDIR /usr/src/app
 
 # Copy package manifests first to leverage Docker layer caching
 COPY package.json package-lock.json* ./
