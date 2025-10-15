@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Image Caption Generator — Developer Usage</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 14px;
+        "
+      >
+        <div>
+          <h1>Image Caption Generator</h1>
+          <p class="lead">
+            Developer usage: how to call the caption API, request shape,
+            examples, and response format.
+          </p>
+        </div>
+        <div style="text-align: right">
+          <div class="badge">POST /api/v1/caption</div>
+          <div class="muted" style="margin-top: 6px">
+            Content-Type: multipart/form-data
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <main class="col">
+          <div>
+            <div class="section-title">What it does</div>
+            <p class="muted">
+              Upload an image file and receive a concise one-line caption
+              describing the image's main subject and notable attributes. The
+              server sends the image to Google GenAI and returns the generated
+              caption.
+            </p>
+          </div>
+
+          <section style="margin-top: 14px">
+            <div class="section-title">Request structure</div>
+            <ul>
+              <li>Method: <strong>POST</strong></li>
+              <li>Path: <strong>/api/v1/caption</strong></li>
+              <li>Content-Type: <strong>multipart/form-data</strong></li>
+              <li>
+                Form field: <strong>image</strong> — the binary file (jpeg, png,
+                gif, webp supported)
+              </li>
+            </ul>
+          </section>
+
+          <section style="margin-top: 14px">
+            <div class="section-title">Examples</div>
+
+            <div style="margin-bottom: 10px">
+              <strong>curl</strong> (Linux/macOS/Windows w/ curl):
+            </div>
+            <pre><code>curl -X POST 'http://localhost:3000/api/v1/caption' \ -F "image=@/path/to/photo.jpg"</code></pre>
+
+            <div style="margin: 12px 0 8px">
+              <strong>PowerShell (Invoke-RestMethod)</strong>:
+            </div>
+            <pre><code>Invoke-RestMethod -Uri 'http://localhost:3000/api/v1/caption' -Method Post -Form @{ image = Get-Item 'C:\path\to\photo.jpg' }</code></pre>
+
+            <div style="margin: 12px 0 8px">
+              <strong>Browser (fetch)</strong>:
+            </div>
+            <pre><code>// JavaScript (client)
+const form = new FormData();
+form.append('image', fileInput.files[0]);
+const res = await fetch('/api/v1/caption', { method: 'POST', body: form });
+const json = await res.json();
+console.log(json.caption);</code></pre>
+          </section>
+
+          <section style="margin-top: 14px">
+            <div class="section-title">Response</div>
+            <pre><code>{
+  "caption": "A concise one-line caption describing the image"
+}</code></pre>
+
+            <div style="margin-top: 8px" class="muted">Errors</div>
+            <ul>
+              <li>
+                <strong>400</strong> — when the `image` field is missing: {
+                "error": "No image file uploaded" }
+              </li>
+              <li>
+                <strong>500</strong> — server or GenAI failure: { "error":
+                "Failed to generate caption" }
+              </li>
+            </ul>
+          </section>
+
+          <section style="margin-top: 14px">
+            <div class="section-title">Environment (server)</div>
+            <p class="muted">
+              The server requires credentials to call the GenAI models. Provide
+              them on the server (do not expose in client code):
+            </p>
+            <pre><code>GEMINI_API_KEY="&lt;your_key_here&gt;"
+ORIGIN="*"</code></pre>
+            <div class="note" style="margin-top: 8px">
+              Do not commit secrets. Use environment variables or cloud secret
+              managers. The client should never see these keys.
+            </div>
+          </section>
+
+          <section style="margin-top: 14px">
+            <div class="section-title">Client tips</div>
+            <ul>
+              <li>
+                Resize large images on the client if possible to reduce upload
+                time and costs.
+              </li>
+              <li>
+                Show progress and friendly messages while the caption is
+                generated.
+              </li>
+              <li>
+                Implement retries with exponential backoff for transient server
+                errors.
+              </li>
+              <li>
+                Protect the endpoint with authentication and rate limits in
+                production.
+              </li>
+            </ul>
+          </section>
+        </main>
+
+        <aside style="padding-left: 18px">
+          <div
+            style="
+              background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.02),
+                rgba(255, 255, 255, 0.01)
+              );
+              padding: 12px;
+              border-radius: 8px;
+            "
+          >
+            <div class="section-title">Quick reference</div>
+            <div class="muted">Endpoint</div>
+            <pre><code>POST /api/v1/caption</code></pre>
+
+            <div class="muted" style="margin-top: 8px">Form field</div>
+            <pre><code>image (file)</code></pre>
+
+            <div class="muted" style="margin-top: 8px">Success</div>
+            <pre><code>{"caption": "..."}</code></pre>
+
+            <div style="margin-top: 12px" class="muted">Notes</div>
+            <ul>
+              <li>Uploads saved to <code>uploads/</code> temporarily.</li>
+              <li>Server deletes uploads after processing.</li>
+              <li>Supported: .jpg, .png, .gif, .webp.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+      <footer>
+        <div>
+          Developers: this page documents the API usage — keep your server keys
+          private. Want a demo UI to upload and preview captions? Ask and I'll
+          scaffold one.
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -84,6 +84,13 @@ async function generateImageCaption(imagePath, providedMimeType) {
   return caption;
 }
 
+app.get("/", (req, res) => {
+  res.sendFile(path.resolve("index.html"));
+});
+app.get("/style.css", (req, res) => {
+  res.sendFile(path.resolve("style.css"));
+});
+
 app.post("/api/v1/caption", upload.single("image"), async (req, res) => {
   const image = req.file;
   if (!image) {
